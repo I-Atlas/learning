@@ -1,2 +1,2 @@
-# googlemailto
-You can set up your on-premises printer, scanner, fax, or app to send email.
+# some s-code
+Some separate code on Python
