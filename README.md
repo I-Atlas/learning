@@ -1,2 +1,2 @@
 # some s-code
-Some separate code on Python
+Some code from Univercity
