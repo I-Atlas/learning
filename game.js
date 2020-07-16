@@ -11,19 +11,19 @@ const game = {
 }
 
 // COLORS
-const color = {
-    BACKGROUND_COLOR: "rgb(0, 0, 0)",
-    SIDE_COLOR: "rgb(94, 94, 94)",
-    BALL_COLOR: "rgb(255, 255, 255)",
-    PADDLE_COLOR: "rgb(255, 255, 255)"
-}
+// const color = {
+//     BACKGROUND_COLOR: "rgb(0, 0, 0)",
+//     SIDE_COLOR: "rgb(94, 94, 94)",
+//     BALL_COLOR: "rgb(255, 255, 255)",
+//     PADDLE_COLOR: "rgb(255, 255, 255)"
+// }
 
 // DIRECTION OF MOVEMENT
-const direction = {
-    LEFT: 0,
-    RIGHT: 1,
-    STOP: 2
-}
+// const direction = {
+//     LEFT: 0,
+//     RIGHT: 1,
+//     STOP: 2
+// }
 
 // DIMENSIONS
 let width, height, side
@@ -37,7 +37,7 @@ let deltaTime, lastTime
 // MAIN BALL CLASS
 class Ball {
     constructor() {
-        this.side = side
+        this.width = side
         this.height = side
         this.x = paddle.x
         this.y = paddle.y - paddle.height / 2 - this.height / 2
@@ -63,78 +63,84 @@ const setDimensions = () => {
     height = window.innerHeight
     width = window.innerWidth
     side = game.SIDE * (height < width ? height : width)
-    canvas.width = width
-    canvas.height = height
+    canvas.width = width //?
+    canvas.height = height // ?
     ctx.lineWidth = side
-    paddle = new Paddle()
-    ball = new Ball()
+    startNewGame()
 }
 
-const newGame = () => {
+const startNewGame = () => {
     paddle = new Paddle()
     ball = new Ball()
 }
 
 const outOfBounds = () => {
-    // TODO out of bounds
-    newGame()
+    // OUT OF BOUNDS WRITE
+    startNewGame()
 }
 
-// KEY DOWN HANDLER FUNCTION
-const keyDownHandler = (event) => {
-    switch (event.keyCode) {
-        case 32: // SPACE BAR STARTS THE BALL
-            ballStart()
-            break
-        case 37: // LEFT ARROW MOVES PADDLE LEFT
-            paddleMove(direction.LEFT)
-            break
-        case 39: // RIGHT ARROW MOVES PADDLE RIGHT
-            paddleMove(direction.RIGHT)
-            break
+
+class Input {
+    constructor() {
+        this.LEFT =  0
+        this.RIGHT = 1
+        this.STOP = 2
+    }
+    keyDownHandler = (event) => {
+        switch (event.keyCode) {
+            case 32: // SPACE BAR STARTS THE BALL
+                ballStart()
+                break
+            case 37: // LEFT ARROW MOVES PADDLE LEFT
+                paddleMove(this.LEFT)
+                // console.log("37")
+                break
+            case 39: // RIGHT ARROW MOVES PADDLE RIGHT
+                paddleMove(this.RIGHT)
+                break
+        }
+    }
+
+    keyUpHandler = (event) => {
+        switch (event.keyCode) {
+            case 37: // LEFT ARROW STOPS MOVING
+            case 39: // RIGHT ARROW STOPS MOVING
+                paddleMove(this.STOP)
+                break
+        }
     }
 }
 
-// KEY UP HANDLER FUNCTION
-const keyUpHandler = (event) => {
-    switch (event.keyCode) {
-        case 37: // LEFT ARROW STOPS MOVING
-        case 39: // RIGHT ARROW STOPS MOVING
-            paddleMove(direction.STOP)
-            break
-    }
-}
+input = new Input()
 
-const touch = (x) => {
-    if (!x) {
-        paddleMove(direction.STOP)
-    } else if (x > paddle.x) {
-        paddleMove(direction.RIGHT)
-    } else if (x < paddle.x) {
-        paddleMove(direction.LEFT)
-    }
-}
+// // KEY DOWN HANDLER FUNCTION
+// const keyDownHandler = (event) => {
+//     switch (event.keyCode) {
+//         case 32: // SPACE BAR STARTS THE BALL
+//             ballStart()
+//             break
+//         case 37: // LEFT ARROW MOVES PADDLE LEFT
+//             paddleMove(direction.LEFT)
+//             // console.log("37")
+//             break
+//         case 39: // RIGHT ARROW MOVES PADDLE RIGHT
+//             paddleMove(direction.RIGHT)
+//             break
+//     }
+// }
 
-const touchStop = () => {
-    touch(null)
-}
+// // KEY UP HANDLER FUNCTION
+// const keyUpHandler = (event) => {
+//     switch (event.keyCode) {
+//         case 37: // LEFT ARROW STOPS MOVING
+//         case 39: // RIGHT ARROW STOPS MOVING
+//             paddleMove(direction.STOP)
+//             break
+//     }
+// }
 
-const touchMove = (event) => {
-    touch(event.touches[0].clientX)
-}
-
-const touchStart = (event) => {
-    if (ballStart()) {
-        return
-    }
-    touch(event.touches[0].clientX)
-}
-
-canvas.addEventListener("touchstop", touchStop)
-canvas.addEventListener("touchmove", touchMove)
-canvas.addEventListener("touchstart", touchStart)
-document.addEventListener("keydown", keyDownHandler)
-document.addEventListener("keyup", keyUpHandler)
+document.addEventListener("keydown", input.keyDownHandler)
+document.addEventListener("keyup", input.keyUpHandler)
 window.addEventListener("resize", setDimensions)
 
 // BALL SPEED HANDLER
@@ -206,40 +212,20 @@ const ballUpdate = (delta) => {
 }
 
 // PADDLE MOVEMENT HANDLER
-const paddleMove = (direction) => {
-    switch (direction) {
-        case direction.LEFT:
+const paddleMove = (DIRECTION) => {
+    switch (DIRECTION) {
+        case input.LEFT:
             paddle.speedX = -paddle.speed
             break
-        case direction.RIGHT:
+        case input.RIGHT:
             paddle.speedX = paddle.speed
             break
-        case direction.STOP:
+        case input.STOP:
             paddle.speedX = 0
             break
     }
 }
 
-
-
-
-
-
-
-const drawBackground = () => {
-    ctx.fillStyle = game.BACKGROUND_COLOR
-    ctx.fillRect(0, 0, width, height)
-}
-
-const drawBall = () => {
-    ctx.fillStyle = game.BALL_COLOR
-    ctx.fillRect(ball.x - ball.w * 0.5, ball.y - ball.h * 0.5, ball.w, ball.h)
-}
-
-const drawPaddle = () => {
-    ctx.fillStyle = game.PADDLE_COLOR
-    ctx.fillRect(paddle.x - paddle.w * 0.5, paddle.y - paddle.h * 0.5, paddle.w, paddle.h)
-}
 
 const paddleUpdate = (delta) => {
     paddle.x += paddle.speedX * delta
@@ -251,38 +237,90 @@ const paddleUpdate = (delta) => {
     }
 }
 
-const drawSides = () => {
+// DRAW CLASS
+class Draw {
+    constructor() {
+        this.BACKGROUND_COLOR = "rgb(0, 0, 0)"
+        this.SIDE_COLOR = "rgb(94, 94, 94)"
+        this.BALL_COLOR = "rgb(255, 255, 255)"
+        this.PADDLE_COLOR = "rgb(255, 255, 255)"
+    }
+
+    /* DRAW BACKGROUND FUNCTION
+    The function that is responsible for drawing the background of the game.
+    (#000000 (black) color)
+    */
+    drawBackground() {
+        ctx.fillStyle = this.BACKGROUND_COLOR
+        ctx.fillRect(0, 0, width, height)
+    }
+
+    /* DRAW BALL FUNCTION
+    The function that is responsible for drawing the ball of the game.
+    (#ffffff (white) color)
+    */
+    drawBall() {
+        ctx.fillStyle = this.BALL_COLOR
+        ctx.fillRect(ball.x - ball.width * 0.5, ball.y - ball.height * 0.5, ball.width, ball.height)
+    }
+
+    /* DRAW PADDLE FUNCTION
+    The function that is responsible for drawing the paddle of the game.
+    (#ffffff (white) color)
+    */
+    drawPaddle() {
+        ctx.fillStyle = this.PADDLE_COLOR
+        ctx.fillRect(paddle.x - paddle.width * 0.5, paddle.y - paddle.height * 0.5, paddle.width, paddle.height)
+    }
+
+    /* DRAW SIDES FUNCTION
+    The function that is responsible for drawing the sides of the game.
+    (#5e5e5e (dark gray) color)
+    */
+    drawSides() {
     let hside = side * 0.5
-    ctx.strokeStyle = game.SIDE_COLOR
+    ctx.strokeStyle = this.SIDE_COLOR
     ctx.beginPath()
     ctx.moveTo(hside, height)
     ctx.lineTo(hside, hside)
     ctx.lineTo(width - hside, hside)
     ctx.lineTo(width - hside, height)
     ctx.stroke()
+    }
 }
 
-const gameLoop = (timestamp) => {
+/* DRAW GAME FUNCTION
+The main function of the entire game,
+which is responsible for rendering and updating elements.
+*/
+const drawGame = (timestamp) => {
     if (!lastTime) {
         lastTime = timestamp
     }
 
-    deltaTime = (timestamp - lastTime) * 0.001
+    // CALCULATE TIME DIFFERENCE
+    deltaTime = (timestamp - lastTime) * 0.001 //? seconds
     lastTime = timestamp
 
+    // UPDATE ELEMENTS
     paddleUpdate(deltaTime)
     ballUpdate(deltaTime)
 
-    drawBackground()
-    drawSides()
-    drawBall()
-    drawPaddle()
+    const draw = new Draw
+    // DRAW GAME ELEMENTS
+    draw.drawBackground()
+    draw.drawSides()
+    draw.drawBall()
+    draw.drawPaddle()
 
-    requestAnimationFrame(gameLoop)
+    // CREATE NEXT GAME LOOP
+    requestAnimationFrame(drawGame)
 }
 
-gameLoop()
+const createNewGame = () => {
+    requestAnimationFrame(drawGame)
+    startNewGame()
+    setDimensions()
+}
 
-newGame()
-
-setDimensions()
+createNewGame()
