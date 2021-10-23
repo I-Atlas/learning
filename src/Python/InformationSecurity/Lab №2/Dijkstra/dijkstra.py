@@ -1,17 +1,15 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-import timeit
 
-g = nx.read_weighted_edgelist("i2.txt", create_using=nx.Graph(), nodetype=int)
+g = nx.read_weighted_edgelist("i3.txt", create_using=nx.DiGraph(), nodetype=int)
 pos = nx.spring_layout(g)
-nx.draw_networkx(g, with_labels=True, pos=pos, node_size=700, node_color="c")
+nx.draw_networkx(g, with_labels=True, pos=pos, node_size=500, node_color="c")
 nx.draw_networkx_edge_labels(g, pos=pos, edge_labels=nx.get_edge_attributes(g, 'weight'))
 plt.axis("off")
 plt.show()
 
 
 def dijkstra(graph, start, end):
-    sta = timeit.default_timer()
     # empty dictionary to hold distances
     distances = {}
     # list of vertices in path to current vertex
@@ -67,9 +65,12 @@ def dijkstra(graph, start, end):
     # be done by backtracking through the predecessors
     path = [end]
     while start not in path:
-        path.append(predecessors[path[-1]])
+        try:
+            path.append(predecessors[path[-1]])
+        except Exception:
+            print("Can't calculate the path")
+            break
 
-    sto = timeit.default_timer()
     # return the path in order start -> end, and it's cost
     return path[::-1], distances[end]
 
@@ -83,7 +84,19 @@ if __name__ == '__main__':
         '5': {'3': 1, '4': 2, '6': 1},
         '6': {'3': 1, '4': 15, '5': 1}
     }
-    path, distance = dijkstra(graph, start='1', end='6')
+
+    graph2 = {
+        '1': {'2': 12, '3': 4, '4': 17},
+        '2': {'4': 10},
+        '3': {'5': 4, '8': 10},
+        '4': {'2': 10, '7': 16},
+        '5': {'3': 4, '6': 4, '8': 4},
+        '6': {'3': 10, '4': 10, '5': 4, '8': 7},
+        '7': {'4': 16},
+        '8': {'3': 10, '5': 4, '6': 7, '7': 18}
+    }
+
+    path, distance = dijkstra(graph2, start='1', end='7')
 
     print("\nPath:\n==============================")
     print(path)
