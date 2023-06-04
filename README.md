@@ -14,7 +14,7 @@ This repository contains code from university. The tasks are written using the f
 
 ## ⚠️ Warning
 
-Some code can contain russian words and unintuitive naming, sorry for this.
+Some code can contain unintuitive naming, sorry for this.
 
 ## 📄 License
 
